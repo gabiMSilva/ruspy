@@ -24,19 +24,22 @@ args   : arg ","?
 arg    : ID (":" ID)?
 
 block  : "{" seq "}" ";"?   -> seq
-       | "{" "}"         -> null
+       | "{" "}"            -> null
 
 ?seq   : cmd+
 
 // "fn" necessário para impedir que uma função seja lida como uma sequência
-?cmd   : "fn"? expr_s ";"       -> null
+?cmd   : "fn"? expr_s ";"   -> null
        | expr_s        
        | expr_b
-       | "let" assign ";" -> let
+       | "let" assign ";"   -> let
 
-if_    : "if" expr block "else" block
+if_    : "if" expr block ("else" "if" expr block)? ("else" block)?
+
 for_   : "for" ID "in" expr block
+
 while_ : "while" expr block
+
 assign : ID "=" expr
 
 ?expr  : expr_s 
@@ -96,7 +99,7 @@ assign : ID "=" expr
        | call "?"          -> opt 
        | call
 
-?call  : ID "(" xargs ")" 
+?call  : ID "(" xargs ")"
        | attr
 
 xargs : expr ("," expr)*
@@ -110,16 +113,18 @@ xargs : expr ("," expr)*
        | atom
 
 ?atom  : lit
-       | "(" expr ")"
 
 lit    : FLOAT
+       | INT
        | BIN_INT
        | OCT_INT
        | HEX_INT
-       | INT
        | RESERVED
        | STRING
        | ID                -> name
+       | ID "(" expr ")"   -> func     
+       | "(" expr ")" 
+
 
 INT: DEC_DIGIT (DEC_DIGIT | "_")*
 BIN_INT   : "0b" (BIN_DIGIT | "_")* BIN_DIGIT (BIN_DIGIT | "_")*
@@ -196,7 +201,6 @@ class RuspyTransformer(InlineTransformer):
 
     # Trata símbolos terminais -------------------------------------------------
     def INT(self, tk):
-        print(tk);
         data = tk.replace('_', '')
         if set(data) == {'0'}:
             return 0  
@@ -227,13 +231,29 @@ class RuspyTransformer(InlineTransformer):
             raise NotImplementedError(f"Implemente a regra def {tk.type}(self, tk): ... no transformer")
 
     def name(self, name):
-        return self.env[name]
+        try:
+            return self.env[name]
+        except KeyError:
+            raise ValueError(f'variável inexistente: {name}')
 
     def assign(self, name, value):
         raise NotImplementedError("assign")
 
     def null(self, *tk):
         return None;
+    
+    def xargs(self, *tk):
+        return self.eval(tk);
+
+    def func(self, name, arg):
+        fn = self.name(name);
+
+        if callable(fn):
+            return fn(arg)
+        raise ValueError(f'{fn} não é uma função!')
+    
+    def seq(self, *tk):
+        return tk[-1]
 
     ...
 
@@ -280,8 +300,38 @@ class RuspyTransformer(InlineTransformer):
     def or_e(self, x, y):
         raise NotImplementedError("or_e")
 
-    def if_(self, cond, then, else_=None):
-        raise NotImplementedError("if")
+    def xargs(self, *tk):
+        self.eval(tk);
+
+    def if_(self, cond, then, elif_cond=None, elif_then=None, else_=None):
+        # print("ARGS: ", self.eval(cond), self.eval(then), self.eval(elif_cond), self.eval(elif_then), self.eval(else_))
+        if(elif_cond == None and elif_then == None and else_ == None):
+            # Só tem if
+            if(self.eval(cond)):
+                return self.eval(then)
+
+        elif(elif_then == None and else_ == None):
+            # If e else
+            if(self.eval(cond)):
+                return self.eval(then)
+            else:
+                return self.eval(elif_cond)
+        elif(else_ == None):
+            # if e elif
+            if(self.eval(cond)):
+                return self.eval(then)
+            elif(self.eval(elif_cond)):
+                return self.eval(elif_then)
+            else:
+                None
+        else:
+            # id, elif e else
+            if(self.eval(cond)):
+                return self.eval(then)
+            elif(self.eval(elif_cond)):
+                return self.eval(elif_then)
+            else:
+                return self.eval(else_)
 
     def while_(self, cond, block):
         raise NotImplementedError("while")
@@ -295,9 +345,6 @@ class RuspyTransformer(InlineTransformer):
 
     def lambd(self, args, block):
         raise NotImplementedError("fn")
-    
-    def seq(self, *tk):
-        return tk[-1]
 
 
 def eval(src):

@@ -1,23 +1,16 @@
 """
 # cfg-bnf
-
 Entender operadores na notação EBNF
-
 * Reconhecer sintaxe e operdores em sua implementações no Lark.
 * Realizar transformação de operações EBNF para suas respectivas representações em BNF.
-
 A regra para "if" abaixo está incompleta.
-
     if_    : "if" expr block "else" block
-
 Esta declaração requer o bloco else obrigatório e não permite encadeamento de ifs
 como nos exemplos que deveriam ser validados
-
     // If sem o bloco else
     if cond {
         println("Hello World!")
     }
-
     // Múltiplos blocos if
     if cond1 {
         println("Hello 1!")
@@ -28,7 +21,6 @@ como nos exemplos que deveriam ser validados
     } else {
         println("Hello other!")
     }
-
 Implemente o suporte a estes dois casos e à avaliação do comando if para passar 
 nos testes.
 """
@@ -42,7 +34,7 @@ def test_eval_if(mod):
     
     print(f"Testando: {src!r}")
     fd = io.StringIO()
-    # print(mod.pretty(mod.parse(src)))
+    print(mod.pretty(mod.parse(src)))
     
     with contextlib.redirect_stdout(fd):
         try:
@@ -55,29 +47,24 @@ def test_eval_if(mod):
 O comando if deve ser implementado de forma diferente dos demais. Não podemos
 deixar o Transformer avaliar automaticamente a condição e os dois ramos do if,
 já que a condição determina qual ramo será executado e qual ficará inerte. 
-
 Para que isso seja possível, registrei o "if_" na lista de formas especiais, em que
 o transformer passa o argumento não avaliado como uma árvore sintática. Podemos
 forçar a avaliação explícita utilizando o método eval(). A diferença entre uma 
 forma normal e uma especial pode ser vista nos dois métodos:
-
     def normal(self, x, y):
         return f(x, y)  # x e y já estão transformados, já podem ser usados por f
-
     def especial(self, x, y):
         # x e y ainda precisam ser avaliados
         x = self.eval(x)
         y = self.eval(y)
         return f(x, y)  # depois de usar eval, podemos utilizá-los normalmente
-
 Usando este conhecimento, agora implemente o método def if_(self, cond, then, else_)!
 """)
     
     out = fd.getvalue()
-    print(out)
-    # assert out != '0\n1\n', 'avaliou os dois ramos do if'
-    # assert out != '1\n', 'avaliou o ramo errado do if'
-    # assert out == '0\n'
+    assert out != '0\n1\n', 'avaliou os dois ramos do if'
+    assert out != '1\n', 'avaliou o ramo errado do if'
+    assert out == '0\n'
 
 @pytest.mark.parametrize(
     "src,v",
@@ -112,4 +99,3 @@ def test_exemplos_negativos(src, mod, data):
     with pytest.raises(lark.LarkError):
         print(f"Código inválido foi aceito: {src!r}")
         print(mod.parse_seq(src).pretty())
-
