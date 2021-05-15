@@ -14,6 +14,7 @@ MATRICULA = "01/2345678"
 # Gramática do Ruspy. (não modifique o nome desta variável, testes dependem disto!)
 GRAMMAR = r"""
 mod    : fn+
+
 fn     : "fn" ID "(" args? ")" block 
        | ID "(" xargs? ")" ";"
 
@@ -22,15 +23,20 @@ args   : arg ","?
 
 arg    : ID (":" ID)?
 
-?cmd   : expr_s ";"       -> cmd
+block  : "{" seq "}" ";"?   -> seq
+       | "{" "}"         -> null
+
+?seq   : cmd+
+
+// "fn" necessário para impedir que uma função seja lida como uma sequência
+?cmd   : "fn"? expr_s ";"       -> null
+       | expr_s        
        | expr_b
        | "let" assign ";" -> let
 
-?seq   : cmd+
 if_    : "if" expr block "else" block
 for_   : "for" ID "in" expr block
 while_ : "while" expr block
-block  : "{" seq "}"
 assign : ID "=" expr
 
 ?expr  : expr_s 
@@ -190,6 +196,7 @@ class RuspyTransformer(InlineTransformer):
 
     # Trata símbolos terminais -------------------------------------------------
     def INT(self, tk):
+        print(tk);
         data = tk.replace('_', '')
         if set(data) == {'0'}:
             return 0  
@@ -220,10 +227,13 @@ class RuspyTransformer(InlineTransformer):
             raise NotImplementedError(f"Implemente a regra def {tk.type}(self, tk): ... no transformer")
 
     def name(self, name):
-        raise NotImplementedError("name")
+        return self.env[name]
 
     def assign(self, name, value):
         raise NotImplementedError("assign")
+
+    def null(self, *tk):
+        return None;
 
     ...
 
@@ -285,6 +295,9 @@ class RuspyTransformer(InlineTransformer):
 
     def lambd(self, args, block):
         raise NotImplementedError("fn")
+    
+    def seq(self, *tk):
+        return tk[-1]
 
 
 def eval(src):
