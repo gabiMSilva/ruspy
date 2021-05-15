@@ -13,29 +13,24 @@ MATRICULA = "01/2345678"
 
 # Gramática do Ruspy. (não modifique o nome desta variável, testes dependem disto!)
 GRAMMAR = r"""
-//  }
 mod    : fn+
+fn     : "fn" ID "(" args? ")" block 
+       | ID "(" xargs? ")" ";"
 
-fn     : "fn" ID "(" args ")" block 
+args   : arg ","?
+       | arg ("," arg)*
 
-args   : arg+
-
-arg    : ID ":" ID
+arg    : ID (":" ID)?
 
 ?cmd   : expr_s ";"       -> cmd
        | expr_b
        | "let" assign ";" -> let
 
 ?seq   : cmd+
-
 if_    : "if" expr block "else" block
-
 for_   : "for" ID "in" expr block
-
 while_ : "while" expr block
-
 block  : "{" seq "}"
-
 assign : ID "=" expr
 
 ?expr  : expr_s 
@@ -98,7 +93,7 @@ assign : ID "=" expr
 ?call  : ID "(" xargs ")" 
        | attr
 
-?xargs : expr ("," expr)*
+xargs : expr ("," expr)*
 
 ?attr  : call ("." ID)+
        | ret
@@ -120,26 +115,23 @@ lit    : FLOAT
        | STRING
        | ID                -> name
 
-INT: BEGIN DEC_DIGIT (DEC_DIGIT | "_")* END
+INT: DEC_DIGIT (DEC_DIGIT | "_")*
 BIN_INT   : "0b" (BIN_DIGIT | "_")* BIN_DIGIT (BIN_DIGIT | "_")*
 OCT_INT   : "0o" (OCT_DIGIT | "_")* OCT_DIGIT (OCT_DIGIT | "_")*
 HEX_INT   : "0x" (HEX_DIGIT | "_")* HEX_DIGIT (HEX_DIGIT | "_")*
 
 // Tipos de ponto-flutante
 
-FLOAT:  BEGIN INT_SHARED "." END
-        | INT_SHARED FLOAT_EXP
-        | INT_SHARED "." INT_SHARED FLOAT_EXP?
-        | INT_SHARED ("." INT_SHARED)? FLOAT_EXP? FLOAT_SUFFIX
+FLOAT:  BEGIN INT "." END
+        | INT FLOAT_EXP
+        | INT "." INT FLOAT_EXP?
+        | INT ("." INT)? FLOAT_EXP? FLOAT_SUFFIX
 
 // DÍGITOS
 BIN_DIGIT : /[0-1]/
 DEC_DIGIT : /[0-9]/
 HEX_DIGIT : /[0-9a-fA-F]/
 OCT_DIGIT : /[0-7]/
-
-//SHARED
-INT_SHARED: DEC_DIGIT (DEC_DIGIT | "_")*
 
 FLOAT_EXP : /[eE][+-]?[0-9_]+/
 
@@ -155,7 +147,7 @@ END       : /$/
 STRING       : /"string"/
 
 // Nomes de variáveis, valores especiais
-ID           : /^[a-zA-Z][a-zA-Z0-9_]*|^_[a-zA-Z0-9_]+/
+ID           : /[a-zA-Z][a-zA-Z0-9_]*|_[a-zA-Z0-9_]+/
 RESERVED     : /true|false|null/
 
 // Comentários
@@ -362,11 +354,11 @@ def _eval_or_exec(src: str, is_exec=False) -> Any:
         bad = bads[0] if bads else tree
         raise NotImplementedError(
             f"""
-não implementou regra para lidar com: {tree.data!r}.
-Crie um método como abaixo na classe do transformer.
-    def {bad.data}(self, ...): 
-        return ... 
-"""
+            não implementou regra para lidar com: {tree.data!r}.
+            Crie um método como abaixo na classe do transformer.
+                def {bad.data}(self, ...): 
+                    return ... 
+            """
         )
     return result
 
