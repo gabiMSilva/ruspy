@@ -121,11 +121,12 @@ class CalcTransformer(InlineTransformer):
         super().__init__()
         self.env = self.names.copy()
 
-    def BIN_INT(self, tk):
-        return int(tk.replace('_', ''), 2)
 
     def INT(self, tk):
         return int(tk.replace('_', ''))
+    
+    def BIN_INT(self, tk):
+        return int(tk.replace('_', ''), 2)
 
     def HEX_INT(self, tk):
         return int(tk.replace('_', ''), 16)
@@ -205,6 +206,8 @@ if __name__ == '__main__':
     assert eval('1 ..= 4') == range(1, 5)
     assert eval('x = false; y = true; x && y') == False
     assert eval('x = true; y = true; x && y') == True
+    assert eval('0b001') == 1
+    eval('53337E-9_77774280');
 
     # Fim de Testes
 
@@ -223,24 +226,24 @@ if __name__ == '__main__':
         # 'HEX_INT',
     }
 
-    with open(path / "examples.json") as fd:
-        data = json.load(fd)
+    # with open(path / "examples.json") as fd:
+    #     data = json.load(fd)
 
-    for kind, examples in data.items():
-        if kind in BLACKLIST:
-            continue
+    # for kind, examples in data.items():
+    #     if kind in BLACKLIST:
+    #         continue
 
-        for ex in examples:
-            try:
-                seq = list(grammar.lex(ex))
-            except LarkError:
-                print(f'erro: {ex}, esperava token do tipo {kind}')
-                break
+    #     for ex in examples:
+    #         try:
+    #             seq = list(grammar.lex(ex))
+    #         except LarkError:
+    #             print(f'erro: {ex}, esperava token do tipo {kind}')
+    #             break
 
-            try:
-                [tk] = seq
-            except ValueError:
-                print(f'erro: {seq}, tipo: {kind}')
-                break
+    #         try:
+    #             [tk] = seq
+    #         except ValueError:
+    #             print(f'erro: {seq}, tipo: {kind}')
+    #             break
 
-            assert tk.type == kind, f'tipo errado: {tk} ({tk.type}), esperava {kind}' 
+    #         assert tk.type == kind, f'tipo errado: {tk} ({tk.type}), esperava {kind}' 
