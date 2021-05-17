@@ -161,7 +161,7 @@ BEGIN     : /^/
 END       : /$/ 
 
 // Strings
-STRING       : /"string"/
+STRING    : /"(\w|\W|\d|\\n|\\r|\\t|\\'|\\"|\\\\|\\0|\\x[0-9a-fA-F]|\\u\{([0-9a-fA-F]_*){1,6}\})*"/
 
 // Nomes de variáveis, valores especiais
 ID           : /[a-zA-Z][a-zA-Z0-9_]*|_[a-zA-Z0-9_]+/
@@ -227,6 +227,9 @@ class RuspyTransformer(InlineTransformer):
     def FLOAT(self, tk):
         return float(tk.replace('_', ''))
 
+    def STRING(self, tk):
+        return str(tk[1:-1])
+
     # Trata símbolos não-terminais ---------------------------------------------
     def lit(self, tk):
         if not isinstance(tk, Token):
@@ -243,7 +246,7 @@ class RuspyTransformer(InlineTransformer):
             raise ValueError(f'variável inexistente: {name}')
 
     def assign(self, name, value):
-        raise NotImplementedError("assign")
+        self.env[str(name)] = self.eval(value);
 
     def null(self, *tk):
         return None;
@@ -256,6 +259,13 @@ class RuspyTransformer(InlineTransformer):
 
         if callable(fn):
             return fn(arg)
+        raise ValueError(f'{fn} não é uma função!')
+
+    def call(self, name, args):
+        fn = self.name(name);
+
+        if callable(fn):
+            return fn(args)
         raise ValueError(f'{fn} não é uma função!')
     
     def seq(self, *tk):
