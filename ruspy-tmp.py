@@ -1,5 +1,6 @@
 import builtins
 import math
+from operator import truediv
 import sys
 from typing import Any
 from lark import Lark, InlineTransformer, LarkError, Token, Tree
@@ -56,28 +57,32 @@ assign : ID "=" expr
 ?lambd : "|" args "|" expr
        | range
 
-?range : and_e ".." and_e
-       | and_e "..=" and_e -> irange
-       | and_e
-
-?and_e : and_e "&&" or_e
+?range : or_e ".." or_e
+       | or_e "..=" or_e -> irange
        | or_e
 
-?or_e  : or_e "||" cmp
+?or_e  : or_e "||" and_e
+       | and_e
+
+?and_e : and_e "&&" cmp
        | cmp
 
-?cmp   : cmp "==" bit      -> eq
-       | cmp "!=" bit      -> ne
-       | cmp "<"  bit      -> lt
-       | cmp ">"  bit      -> gt
-       | cmp "<=" bit      -> le
-       | cmp ">=" bit      -> ge
-       | bit
+?cmp   : or_ "==" or_      -> eq
+       | or_ "!=" or_      -> ne
+       | or_ "<"  or_      -> lt
+       | or_ ">"  or_      -> gt
+       | or_ "<=" or_      -> le
+       | or_ ">=" or_      -> ge
+       | or_
 
-?bit   : bit "|" shift     -> or_
-       | bit "^" shift     -> xor
-       | bit "&" shift     -> and_  
-       | shift    
+?or_   : or_ "|" xor 
+       | xor
+
+?xor    : xor "^" and_ 
+       | and_  
+
+?and_   : and_ "&" shift  
+        | shift
 
 ?shift : shift ">>" sum    -> rshift     
        | shift "<<" sum    -> lshift
@@ -88,7 +93,8 @@ assign : ID "=" expr
        | mul
 
 ?mul   : mul "*" typed     -> mul     
-       | mul "/" typed     -> div     
+       | mul "/" typed     -> div_ 
+       | mul "%" typed     -> rest     
        | typed
 
 ?typed : typed "as" unary  -> typed     
@@ -255,6 +261,23 @@ class RuspyTransformer(InlineTransformer):
     def seq(self, *tk):
         return tk[-1]
 
+    def rest(self, n1, n2):
+        if(isinstance(n1, int) and isinstance(n2, int)):
+            return int(n1 % n2);
+        return n1 % n2;
+
+    def div_(self, n1, n2):
+        if(isinstance(n1, int) and isinstance(n2, int)):
+            return n1 // n2;
+
+        return float(n1 / n2);
+
+    def range(self, a, b):
+        return range(a, b);
+    
+    def irange(self, a, b):
+        return range(a, b + 1);
+
     ...
 
     # Formas especiais --------------------------------------------------------
@@ -298,7 +321,7 @@ class RuspyTransformer(InlineTransformer):
         return self.eval(x) and self.eval(y)
 
     def or_e(self, x, y):
-        raise NotImplementedError("or_e")
+        return self.eval(x) or self.eval(y);
 
     def xargs(self, *tk):
         self.eval(tk);
