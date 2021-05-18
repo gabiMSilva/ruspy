@@ -7,6 +7,8 @@ Representar sequências em notação BNF e EBNF.
 * Diferenciar separadores intercalados de listas com último separador opcional.
 * Representar listas com delimitadores.
 
+-----
+
 Testaremos esta competência corrigindo a implementação das regras "args" e "xargs" 
 na gramática. A regra args se refere aos argumentos durante a DECLARAÇÃO de 
 uma função enquanto xargs dita como estes argumentos devem ser passados durante

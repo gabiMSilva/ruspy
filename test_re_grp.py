@@ -58,8 +58,6 @@ Este código viraria:
 
 '''
 import pytest
-import lark
-
 
 def test_verificações_básicas():
     pytest.skip('o código de teste ainda não está pronto')

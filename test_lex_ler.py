@@ -49,56 +49,10 @@ por um espaço. Considere as seguintes categorias:
 Cada palavra reservada possui sua categoria a parte como FN, IF, etc.
 """
 import pytest
-import lark
 
 
-@pytest.mark.parametrize("grp", "ID INT BIN_INT OCT_INT HEX_INT FLOAT".split())
-def test_exemplos_positivos(grp, mod, data):
-    for ex in sorted(data(grp), key=len):
-        typ = None
-        if grp.endswith("INT"):
-            typ = int
-        if grp.endswith("FLOAT"):
-            typ = float
-        check_valid_token(ex, mod, grp, typ=typ)
-
-
-def test_comentários(mod, data):
-    grp = "COMMENT"
-    for ex in sorted(data(grp), key=len):
-        print(f"Testando: {ex!r} ({grp})")
-        seq = mod.lex_list(ex)
-        if seq:
-            raise AssertionError(f"erro: esperava comentário, obteve sequência {seq}")
-
-
-@pytest.mark.parametrize("grp", "ID INT BIN_INT OCT_INT HEX_INT FLOAT COMMENT".split())
-def test_exemplos_negativos(grp, mod, data):
-    for ex in sorted(data(grp + "_bad"), key=len):
-        print(f"Testando: {ex!r} ({grp})")
-        try:
-            seq = mod.lex_list(ex)
-        except lark.LarkError:
-            continue
-
-        if grp == "COMMENT" and not seq:
-            raise AssertionError(f"aceitou elemento: {ex}")
-        elif len(seq) == 1 and seq[0].type == grp and seq[0] == ex:
-            raise AssertionError(f"aceitou elemento: {seq}")
-
-
-def check_valid_token(ex, mod, grp, typ=None):
-    print(f"Testando: {ex!r} ({grp})")
-    seq = mod.lex_list(ex)
-    try:
-        [tk] = seq
-    except ValueError:
-        raise AssertionError(f"erro: esperava token único, obteve sequência {seq}")
-
-    if typ is not None:
-        val = mod.transform(tk)
-        assert isinstance(
-            val, typ
-        ), f"tipo errado {tk} ({tk.type}): esperava {typ}, obteve {type(val)}"
-
-    return seq
+def test_verificações_básicas(var, fn):
+    # size_hint = 10
+    # var('FAT_LEXEMAS', type=list, hash='none', check=[fn.size(size_hint)])
+    # var('FAT_TOKENS', type=list, hash='none', check=[fn.size(size_hint)])
+    pytest.skip('o código de teste ainda não está pronto')

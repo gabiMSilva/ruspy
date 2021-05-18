@@ -44,9 +44,7 @@ de programação de listar os casos válidos do ruspy.lark explicitamente. Por
 isto, existe um limite de 40 caracteres por regex.
 """
 import pytest
-import lark
 
 
 def test_verificações_básicas():
-    pytest.skip('o código de teste ainda não está pronto')
-
+    pytest.skip("o código de teste ainda não está pronto")

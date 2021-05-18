@@ -2,6 +2,9 @@
 Funcionalidades compartilhadas por todos modulos de teste
 """
 from pprint import pformat
+from base64 import b64encode
+from hashlib import md5
+from functools import singledispatch
 import json
 from types import SimpleNamespace
 from random import choice, random, randint
@@ -93,10 +96,11 @@ def mod():
     if not mod and not path.exists():
         path = Path.cwd() / "ruspy-tmp.py"
 
-    with open(path) as fd:
+    with open(path, "rb") as fd:
         src = fd.read()
     ns = {}
-    exec(compile(src, 'ruspy.py', 'exec'), ns)
+    exec(compile(src, "ruspy.py", "exec"), ns)
+    ns_orig = ns.copy()
 
     if "GRAMMAR" not in ns:
         raise ValueError("não é permitido modificar o nome da variável GRAMMAR")
@@ -105,7 +109,7 @@ def mod():
     if "RuspyTransformer" not in ns:
         raise ValueError("Não encontrou o RuspyTransformer")
 
-    exec(compile(EXTRA_SRC, 'extra.py', 'exec'), ns)
+    exec(compile(EXTRA_SRC, "extra.py", "exec"), ns)
     lex = ns["grammar_expr"].lex
     transformer = ns["RuspyTransformer"]
     lark.InlineTransformer
@@ -114,7 +118,7 @@ def mod():
         bads = [*bad.find_pred(lambda x: not hasattr(transformer, x.data))]
         return bads[0] if bads else bad
 
-    ns['find_bad'] = find_bad
+    ns["find_bad"] = find_bad
 
     def parse(src):
         try:
@@ -131,11 +135,34 @@ def mod():
         except AttributeError:
             return pformat(obj)
 
+    def var(name, type=object, hash=None, check=()):
+        try:
+            res = ns_orig[name]
+        except KeyError:
+            raise ValueError(
+                f"Não encontrei a variável {name}. Ela está declarada no código?"
+            )
+
+        if not isinstance(res, type):
+            raise ValueError(
+                f"Esperava que {name} fosse um(a) {type.__name__}, mas obtive {type(res).__name__}."
+            )
+
+        for fn in check:
+            fn(res)
+
+        if hash is not None:
+            computed = human_hash(res)
+            assert computed == hash, f"hash inválida: {computed}\nesperava: {hash}"
+
+        return res
+
     return SimpleNamespace(
         **{
             **ns,
             **{
                 "lex": lex,
+                "var": var,
                 "parse": parse,
                 "parse_seq": ns["grammar_seq"].parse,
                 "parse_expr": ns["grammar_expr"].parse,
@@ -162,6 +189,11 @@ def data():
     return data_fn
 
 
+@pytest.fixture(scope="session")
+def var(mod):
+    return mod.var
+
+
 prob = lambda p: random() < p
 digit = lambda ds="123456789": choice(ds)
 randrange = lambda a, b: range(a, randint(a, b) + 1)
@@ -178,7 +210,7 @@ def check_int(ex: str):
 
 
 def data_fn(name):
-    with open(PATH / "data" / (name + ".json")) as fd:
+    with open(PATH / "data" / (name + ".json"), encoding="utf8") as fd:
         return json.load(fd)
 
 
@@ -194,3 +226,33 @@ def leaves(tree):
 
     visit(tree)
     return leaves
+
+
+def human_hash(x):
+    h = special_hash(x)
+    return b64encode(h).decode("ascii")
+
+
+@singledispatch
+def special_hash(x) -> bytes:
+    raise NotImplementedError
+
+
+@special_hash.register(int)
+def _int(x):
+    return b64encode(x.to_bytes(32, "").lstrip("\x00"))
+
+
+@special_hash.register(str)
+def _str(x):
+    hasher = md5(x)
+    return hasher.digest()
+
+
+@special_hash.register(tuple)
+@special_hash.register(list)
+def _seq(xs):
+    hasher = md5()
+    for x in xs:
+        hasher.update(special_hash(x))
+    return f"{len(xs)}:".encode("ascii") + hasher.digest()

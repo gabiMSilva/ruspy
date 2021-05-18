@@ -342,3 +342,38 @@ Uma cópia exata desta gramática está no arquivo "ruspy.lark" neste mesmo repo
 ## Começando os trabalhos
 
 Crie uma cópia do arquivo exemplo.py como ruspy.py e começe a trabalhar! A atividade mais fácil para começar a aquecer provavelmente é a re_basico. Mãos à obra!
+
+
+## Roteiro sugerido
+
+Vocês podem resolver as questões em qualquer ordem, mas existe uma sequência
+natural para se seguir. Podemos dividir as questões em alguns temas independentes
+e para cada tema sugiro uma sequência específica:
+
+Ruspy
+
+1. re_basico
+2. lex_ler
+3. lex_re
+5. cfg_list
+6. cfg_bnf
+7. cfg_ebnf
+8. cfg_op
+9. cfg_reduce
+10. cfg_ast
+11. re_prog (ganha automaticamente se lex_re passar)
+
+Autômatos
+
+1. O arquivo test_automatos.py na realidade testa 5 competências: dfa-repr, nfa-repr, nfa-thompson, nfa-epsilon, nfa-dfa
+
+Arquitetura de compiladores
+
+1. comp_org
+2. comp_vs_interp
+
+Padrões de expressões regulares
+
+1. re_ler
+2. re_pat
+3. re_grp
