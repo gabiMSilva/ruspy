@@ -556,23 +556,10 @@ COMP_VS_INTERP_Q2 = """
 
 """
 
-
-# // Fatorial
-# fn fat(n: int) {
-#     r = n
-#     for i in 1..n {
-#         r *= i
-#     }
-#     r
-# }
-
-
-#     ID  - identificadores 
-#     INT - inteiros
-#     OP  - operadores binários
-#     LBRACE/RBRACE - chaves (abrir/fechar) 
-#     LPAR/RPAR     - parênteses (abrir/fechar) 
-
 FAT_LEXEMAS = ["fn", "fat", "n:int", "r" ,"n", "for", "i", "1..n", "1", "n", "r", "i"] 
 
 FAT_TOKENS = ["fn FN", "fat ID", "n:int ARG", "r ID", "n INT","for FOR", "i INT", "1..n RANGE", "1 INT", "n INT", "r ID", "i INT"] 
+
+SUBS_REMOVER_COMENTARIOS = (r"#.*", "")
+SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", r'"""\1"""') # Caso use re.sub
+# SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", '"""$1"""') # Caso use o VSCode
