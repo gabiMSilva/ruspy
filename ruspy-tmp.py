@@ -483,3 +483,46 @@ if __name__ == "__main__":
             print(f"\n> {eval(src)}")
         else:
             run(src)
+
+
+# test_comp_org
+
+COMP_ORG = """
+    * Análise léxica:
+                            A análise léxica é a etapa onde os lexemas são identificados e agrupados, gerando Tokens que são caracterizados a partir de 
+                        definições de padrões definidos para cada um deles. 
+                            Isso significa dizer que só serão identificados os lexemas que estiverem de acordo com um padrão pré definido da linguagem 
+                        ou será gerado um erro.
+
+    * Análise sintática:
+                            Na etapa de análise sintática (também conhecida como 'parser') o compilador irá reconhecer os conjuntos de Tokens do código e 
+                        determinar se ele é valido ou não. 
+                            Para isso podem ser usadas gramáticas livres de contexto, por exemplo.
+
+    * Análise semântica: 
+                            A análise semântica é responsável por verificar aspectos de significado dos comandos. Em uma atribuição de valor à um identificador, 
+                        temos alguns exemplos abaixo de validações que o analizador semântico deve fazer :
+                        
+                        - O identificador é uma variável?
+                        - As variáveis usadas já foram declaradas anteriormente?
+                        - Qual o tipo da variável?
+                        - O tipo do valor que está sendo atribuído corresponde ao tipo declarado?
+                        - A variável foi declarada em um contexto que pode ser acessado nesse local?
+
+    * Otimização:
+                            Na etapa de otimização, o compilador deve identificar comandos e regras que estão sendo utilizadas de forma ineficientes e 
+                        melhorá-las a fim de obter um melhor desempenho. Alguns exemplos de otimiza'ção de código são: 
+                            
+                        - Remoção de código redundante
+                        - Remoção de código inalcançável (dentro de um 'if(false)', por exemplo)
+                        - Repetição de atriuições com os mesmos valores
+                            - x = 2;
+                              x = 2;
+                            - A segunda atribuição poderia ser removida sem prejuízo ao programa.
+
+                            Há muitos outros pontos de otimização, esses são exemplos simples apenas para visualização do conceito apresentado.
+    * Emissão de código:
+                            Nessa etapa, o compilador deve gerar um código que possa ser lido diretamente pelo SO.
+                            Na linguagem C podemos ver claramente o objeto de código gerado após executar a compilação.
+
+"""
