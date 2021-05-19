@@ -526,3 +526,32 @@ COMP_ORG = """
                             Na linguagem C podemos ver claramente o objeto de código gerado após executar a compilação.
 
 """
+
+COMP_VS_INTERP_Q1 = """
+                            Tanto o interpretador quanto o compilador, traduzem instruções de código para linguagem de máquina, a principal diferença entre 
+                        compiladores e interpretadores é a forma como os códigos são traduzidos. 
+                            Enquanto um compilador traduz todo o código e executa o arquivo final depois, o interpretador traduz por blocos ou instruções e não possui um arquivo resultante.
+                            Isso leva o compilador a ser mais eficiente, pois o código não precisa ser traduzido sempre que for executado. Em compensação, o interpretador pode ser 
+                        executado em qualquer SO, pois traduz o código em tempo de execução, bastando que o interpretador esteja instalado na máquina.
+
+"""
+
+COMP_VS_INTERP_Q2 = """
+
+                            O C/C++ é uma linguagem tida geralmente como compilada, porém tembém existem interpretadores para C!
+                            O PicoC (https://github.com/jpoirier/picoc) é um deles.
+
+
+                            "PicoC is a very small C interpreter for scripting. It was originally written as a script language for a 
+                        UAV on-board flight system. It's also very suitable for other robotic, embedded and non-embedded applications.
+
+                            The core C source code is around 3500 lines of code. It's not intended to be a complete implementation of ISO 
+                        C but it has all the essentials. When compiled it only takes a few k of code 
+                        space and is also very sparing of data space. This means it can work well in small embedded devices. It's also 
+                        a fun example of how to create a very small language implementation while still keeping the code readable."
+                        
+                        Fonte: https://github.com/jpoirier/picoc
+
+
+
+"""
