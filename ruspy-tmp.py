@@ -135,7 +135,7 @@ lit    : FLOAT
 INT: DEC_DIGIT (DEC_DIGIT | "_")*
 BIN_INT   : "0b" (BIN_DIGIT | "_")* BIN_DIGIT (BIN_DIGIT | "_")*
 OCT_INT   : "0o" (OCT_DIGIT | "_")* OCT_DIGIT (OCT_DIGIT | "_")*
-HEX_INT   : "0x" (HEX_DIGIT | "_")* HEX_DIGIT (HEX_DIGIT | "_")*
+HEX_INT.2   : "0x" (HEX_DIGIT | "_")* HEX_DIGIT (HEX_DIGIT | "_")*
 
 // Tipos de ponto-flutante
 
@@ -555,31 +555,6 @@ COMP_VS_INTERP_Q2 = """
 
 
 """
-"""
-    FAT_TOKENS = ["fn FN", "fat ID", ...] 
-
-ou seja, cada string contêm o lexema e a categoria de não-terminal separados
-por um espaço. Considere as seguintes categorias:
-
-    ID  - identificadores 
-    INT - inteiros
-    OP  - operadores binários
-    LBRACE/RBRACE - chaves (abrir/fechar) 
-    LPAR/RPAR     - parênteses (abrir/fechar) 
-
-Cada palavra reservada possui sua categoria a parte como FN, IF, etc.
-
-
-// Fatorial
-    fn fat(n: int) {
-        r = n
-        for i in 1..n {
-            r *= i
-        }
-        r
-    }
-
-"""
 
 FAT_LEXEMAS = ["fn", "fat", "n", "r" ,"n", "for", "i", "1..n", "1", "n", "r", "i", "r"] 
 
@@ -594,3 +569,7 @@ REGEX_CROSSWORDS = {
     "intermediate/puzzles/2": "WALKER",
     "intermediate/puzzles/3": "FORTY-TWO",
 }
+
+REGEX_TERMINAIS = r"^[A-Z0-9_.]+\s*:"
+REGEX_NAO_TERMINAIS = r"^\??[a-z0-9_.]+\s*:"
+REGEX_TERMINAIS_E_NAO_TERMINAIS = r"^\??[a-zA-Z0-9_.]+\s*:"
