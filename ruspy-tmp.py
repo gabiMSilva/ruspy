@@ -555,10 +555,35 @@ COMP_VS_INTERP_Q2 = """
 
 
 """
+"""
+    FAT_TOKENS = ["fn FN", "fat ID", ...] 
 
-FAT_LEXEMAS = ["fn", "fat", "n:int", "r" ,"n", "for", "i", "1..n", "1", "n", "r", "i"] 
+ou seja, cada string contêm o lexema e a categoria de não-terminal separados
+por um espaço. Considere as seguintes categorias:
 
-FAT_TOKENS = ["fn FN", "fat ID", "n:int ARG", "r ID", "n INT","for FOR", "i INT", "1..n RANGE", "1 INT", "n INT", "r ID", "i INT"] 
+    ID  - identificadores 
+    INT - inteiros
+    OP  - operadores binários
+    LBRACE/RBRACE - chaves (abrir/fechar) 
+    LPAR/RPAR     - parênteses (abrir/fechar) 
+
+Cada palavra reservada possui sua categoria a parte como FN, IF, etc.
+
+
+// Fatorial
+    fn fat(n: int) {
+        r = n
+        for i in 1..n {
+            r *= i
+        }
+        r
+    }
+
+"""
+
+FAT_LEXEMAS = ["fn", "fat", "n", "r" ,"n", "for", "i", "1..n", "1", "n", "r", "i", "r"] 
+
+FAT_TOKENS = ["fn FN", "fat ID", "n ID", "r ID", "n INT","for FOR", "i INT", "1..n RANGE", "1 INT", "n INT", "r ID", "i INT", "r INT"] 
 
 SUBS_REMOVER_COMENTARIOS = (r"#.*", "")
 SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", r'"""\1"""') # Caso use re.sub
