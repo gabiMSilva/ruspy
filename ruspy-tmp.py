@@ -486,7 +486,6 @@ if __name__ == "__main__":
 
 
 # test_comp_org
-
 COMP_ORG = """
     * Análise léxica:
                             A análise léxica é a etapa onde os lexemas são identificados e agrupados, gerando Tokens que são caracterizados a partir de 
@@ -527,6 +526,8 @@ COMP_ORG = """
 
 """
 
+
+#test_com_vs_interp
 COMP_VS_INTERP_Q1 = """
                             Tanto o interpretador quanto o compilador, traduzem instruções de código para linguagem de máquina, a principal diferença entre 
                         compiladores e interpretadores é a forma como os códigos são traduzidos. 
@@ -555,21 +556,27 @@ COMP_VS_INTERP_Q2 = """
 
 
 """
-
+# test_lex_ler
 FAT_LEXEMAS = ["fn", "fat", "n", "r" ,"n", "for", "i", "1..n", "1", "n", "r", "i", "r"] 
 
 FAT_TOKENS = ["fn FN", "fat ID", "n ID", "r ID", "n INT","for FOR", "i INT", "1..n RANGE", "1 INT", "n INT", "r ID", "i INT", "r INT"] 
 
+
+# test_re_grp
 SUBS_REMOVER_COMENTARIOS = (r"#.*", "")
 SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", r'"""\1"""') # Caso use re.sub
 # SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", '"""$1"""') # Caso use o VSCode
 
+
+# test_re_ler
 REGEX_CROSSWORDS = {
     "intermediate/puzzles/1": "ATOWEL",
     "intermediate/puzzles/2": "WALKER",
     "intermediate/puzzles/3": "FORTY-TWO",
 }
 
+
+# test_re_pat
 REGEX_TERMINAIS = r"^[A-Z0-9_.]+\s*:"
 REGEX_NAO_TERMINAIS = r"^\??[a-z0-9_.]+\s*:"
 REGEX_TERMINAIS_E_NAO_TERMINAIS = r"^\??[a-zA-Z0-9_.]+\s*:"
