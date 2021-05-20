@@ -588,3 +588,9 @@ FAT_TOKENS = ["fn FN", "fat ID", "n ID", "r ID", "n INT","for FOR", "i INT", "1.
 SUBS_REMOVER_COMENTARIOS = (r"#.*", "")
 SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", r'"""\1"""') # Caso use re.sub
 # SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", '"""$1"""') # Caso use o VSCode
+
+REGEX_CROSSWORDS = {
+    "intermediate/puzzles/1": "ATOWEL",
+    "intermediate/puzzles/2": "WALKER",
+    "intermediate/puzzles/3": "FORTY-TWO",
+}
