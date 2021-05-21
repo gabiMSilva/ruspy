@@ -7,8 +7,8 @@ from lark import Lark, InlineTransformer, LarkError, Token, Tree
 
 # Constantes (algumas tarefas pedem para incluir variáveis específicas nesta
 # parte do arquivo)
-NAME = "Meu nome"
-MATRICULA = "01/2345678"
+NAME = "Gabriela Medeiros da Silva"
+MATRICULA = "16/0121817"
 ...
 
 
@@ -28,12 +28,13 @@ block  : "{" seq "}" ";"?   -> seq
        | "{" "}"            -> null
 
 ?seq   : cmd+
+       | cmd+ expr_s
+       | expr_s
 
 // "fn" necessário para impedir que uma função seja lida como uma sequência
 ?cmd   : "fn"? expr_s ";"   -> null
-       | expr_s        
-       | expr_b
        | "let" assign ";"   -> let
+       | expr_b
 
 if_    : "if" expr block ("else" "if" expr block)? ("else" block)?
 
