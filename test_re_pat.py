@@ -44,7 +44,21 @@ de programação de listar os casos válidos do ruspy.lark explicitamente. Por
 isto, existe um limite de 40 caracteres por regex.
 """
 import pytest
+import re
 
 
-def test_verificações_básicas():
-    pytest.skip("o código de teste ainda não está pronto")
+def test_verificações_básicas(var):
+    with open("ruspy.lark") as fd:
+        src = fd.read()
+
+    assert check_regex(var("REGEX_NAO_TERMINAIS"), src) == 31
+    assert check_regex(var("REGEX_TERMINAIS"), src) == 14
+    assert check_regex(var("REGEX_TERMINAIS_E_NAO_TERMINAIS"), src) == 14 + 31
+
+
+def check_regex(pat, src):
+    pat = re.compile(pat)
+    count = 0
+    for ln in src.splitlines():
+        count += len(pat.findall(ln))
+    return count

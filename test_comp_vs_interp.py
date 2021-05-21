@@ -44,5 +44,7 @@ Salve a sua resposta em duas variáveis do tipo string como abaixo:
 '''
 import pytest
 
-def test_verificações_básicas():
-    pytest.skip('o código de teste ainda não está pronto')
+def test_verificações_básicas(var):
+    print(var('COMP_VS_INTERP_Q1'))
+    print(var('COMP_VS_INTERP_Q2'))
+    pytest.skip('a resposta será avaliada manualmente')

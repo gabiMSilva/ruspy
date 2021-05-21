@@ -26,5 +26,6 @@ Salve a sua resposta em uma variável de string como abaixo:
 '''
 import pytest
 
-def test_verificações_básicas():
-    pytest.skip('o código de teste ainda não está pronto')
+def test_verificações_básicas(var):
+    print(var('COMP_ORG'))
+    pytest.skip('a resposta será avaliada manualmente')

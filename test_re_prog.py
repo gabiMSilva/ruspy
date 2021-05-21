@@ -26,7 +26,27 @@ Lembrando mais uma vez: se os testes de lex-re passaram, NÂO PRECISA submeter
 esta resposta já que a pontuação é conferida automaticamente.
 """
 import pytest
+import re
 
 
-def test_verificações_básicas():
-    pytest.skip("o código de teste ainda não está pronto")
+@pytest.fixture(scope="module")
+def regex_prog(mod):
+    try:
+        return mod.REGEX_PROG
+    except AttributeError:
+        pytest.skip("verifique manualmente se você passou em lex-re")
+
+
+@pytest.mark.parametrize("grp", "ID INT BIN_INT OCT_INT HEX_INT FLOAT".split())
+def test_exemplos_positivos(grp, mod, data, regex_prog):
+    regex = re.compile(regex_prog[grp])
+    for ex in sorted(data(grp), key=len):
+        assert regex.fullmatch(ex), f"Valor não aceito: {ex}"
+
+
+@pytest.mark.parametrize("grp", "ID INT BIN_INT OCT_INT HEX_INT FLOAT COMMENT".split())
+def test_exemplos_negativos(grp, mod, data, regex_prog):
+    all_regex = [re.compile(v) for v in regex_prog.values()]
+
+    for ex in sorted(data(grp + "_bad"), key=len):
+        assert all(not re.fullmatch(ex) for re in all_regex), f'padrão inválido foi aceito: {ex}'

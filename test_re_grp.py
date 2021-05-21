@@ -58,7 +58,34 @@ Este código viraria:
 
 '''
 import pytest
+from typing import Tuple
+import re
 
-def test_verificações_básicas():
-    pytest.skip('o código de teste ainda não está pronto')
 
+def test_verifica_remover_comentários(var, check_value):
+    with open("exemplo.py") as fd:
+        src = fd.read()
+
+    src_ = apply_subs(var("SUBS_REMOVER_COMENTARIOS"), src)
+    print("ARQUIVO APÓS ELIMINAÇÂO DE COMENTÀRIOS")
+    print(indent(src_))
+    assert "#" not in src_
+
+
+def test_verifica_trocar_comentários_para_strings(var, data):
+    with open("exemplo.py") as fd:
+        src = fd.read()
+
+    got = apply_subs(var("SUBS_COMENTARIOS_STRINGS"), src).strip()
+    expect = data("exemplo-cmt.py").strip()
+    assert got == expect
+
+
+def apply_subs(pair: Tuple[str, str], src: str) -> str:
+    pat, subs = pair
+    subs = re.sub(r"\$([0-9]+)", lambda m: "\\" + m.group(1), subs)
+    return "\n".join(re.sub(pat, subs, ln) for ln in src.splitlines())
+
+
+def indent(src):
+    return "\n".join("    " + ln for ln in src.splitlines())

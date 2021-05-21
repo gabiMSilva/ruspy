@@ -56,7 +56,11 @@ def test_exemplos_positivos(src, v, mod):
     assert mod.eval(src) == v
 
 
-@pytest.mark.parametrize("src", [])
+@pytest.mark.parametrize("src", [
+  "1 2",
+  "1 ;; 2",
+  "1 ;;",
+])
 def test_exemplos_negativos(src, mod, data):
     with pytest.raises(lark.LarkError):
         print(f"Código inválido foi aceito: {src!r}")

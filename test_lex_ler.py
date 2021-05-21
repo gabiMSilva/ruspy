@@ -51,8 +51,26 @@ Cada palavra reservada possui sua categoria a parte como FN, IF, etc.
 import pytest
 
 
-def test_verificações_básicas(var, fn):
-    # size_hint = 10
-    # var('FAT_LEXEMAS', type=list, hash='none', check=[fn.size(size_hint)])
-    # var('FAT_TOKENS', type=list, hash='none', check=[fn.size(size_hint)])
-    pytest.skip('o código de teste ainda não está pronto')
+def test_verificações_básicas(var, check_value, fn):
+    size_hint = 24
+
+    lexemas = var("FAT_LEXEMAS")
+    tokens = var("FAT_TOKENS")
+    assert len(lexemas) == len(tokens)
+    tok_class = {tk.split()[1] for tk in tokens}
+    assert tok_class == {"FN", "FOR", "IN", "ID", "INT", "OP", "LBRACE", "RBRACE", "LPAR", "RPAR"} 
+
+    check_value(
+        lexemas,
+        name="FAT_LEXEMAS",
+        type=list,
+        hash="MjQ6AD8NORcHa9YKPMlnYAmp6A==",
+        check=[fn.size(size_hint)],
+    )
+    check_value(
+        tokens,
+        name="FAT_TOKENS",
+        type=list,
+        hash="MjQ6eDGqAGldx9jyZm2FqVyIJg==",
+        check=[fn.size(size_hint)],
+    )

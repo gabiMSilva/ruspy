@@ -4,7 +4,7 @@ Funcionalidades compartilhadas por todos modulos de teste
 from pprint import pformat
 from base64 import b64encode
 from hashlib import md5
-from functools import singledispatch
+from functools import singledispatch, wraps
 import json
 from types import SimpleNamespace
 from random import choice, random, randint
@@ -135,27 +135,34 @@ def mod():
         except AttributeError:
             return pformat(obj)
 
-    def var(name, type=object, hash=None, check=()):
+    def var(name, **kwargs):
         try:
             res = ns_orig[name]
         except KeyError:
             raise ValueError(
                 f"Não encontrei a variável {name}. Ela está declarada no código?"
             )
+        check_value(res, name=name, **kwargs)
+        return res
 
-        if not isinstance(res, type):
+    def check_value(value, type=object, hash=None, check=(), name="var"):
+        if not isinstance(value, type):
             raise ValueError(
-                f"Esperava que {name} fosse um(a) {type.__name__}, mas obtive {type(res).__name__}."
+                f"Esperava que {name} fosse um(a) {type.__name__}, mas obtive {type(value).__name__}."
             )
 
         for fn in check:
-            fn(res)
+            fn(value)
 
         if hash is not None:
-            computed = human_hash(res)
-            assert computed == hash, f"hash inválida: {computed}\nesperava: {hash}"
-
-        return res
+            computed = human_hash(value)
+            assert computed == hash, (
+                f"hash inválida para {name}:\n"
+                f"  - obtida: {computed}\n"
+                f"  - esperada: {hash}"
+                f"{print(value) or ''}\n"
+                f"O valor obtido não corresponde ao registrado no banco de respostas.\n"
+            )
 
     return SimpleNamespace(
         **{
@@ -163,6 +170,7 @@ def mod():
             **{
                 "lex": lex,
                 "var": var,
+                "check_value": check_value,
                 "parse": parse,
                 "parse_seq": ns["grammar_seq"].parse,
                 "parse_expr": ns["grammar_expr"].parse,
@@ -194,6 +202,16 @@ def var(mod):
     return mod.var
 
 
+@pytest.fixture(scope="session")
+def check_value(mod):
+    return mod.check_value
+
+
+@pytest.fixture(scope="session")
+def fn(mod):
+    return Validators().namespace()
+
+
 prob = lambda p: random() < p
 digit = lambda ds="123456789": choice(ds)
 randrange = lambda a, b: range(a, randint(a, b) + 1)
@@ -210,6 +228,10 @@ def check_int(ex: str):
 
 
 def data_fn(name):
+    if name.endswith('.py'):
+        with open(PATH / "data" / name, encoding="utf8") as fd:
+            return fd.read()
+    
     with open(PATH / "data" / (name + ".json"), encoding="utf8") as fd:
         return json.load(fd)
 
@@ -245,7 +267,7 @@ def _int(x):
 
 @special_hash.register(str)
 def _str(x):
-    hasher = md5(x)
+    hasher = md5(x.encode("utf8"))
     return hasher.digest()
 
 
@@ -256,3 +278,26 @@ def _seq(xs):
     for x in xs:
         hasher.update(special_hash(x))
     return f"{len(xs)}:".encode("ascii") + hasher.digest()
+
+
+class Validators:
+    METHODS = ["size"]
+
+    def namespace(self):
+        return SimpleNamespace(
+            **{k: self.validator(getattr(self, k)) for k in self.METHODS}
+        )
+
+    def validator(self, fn):
+        @wraps(fn)
+        def func(*args):
+            return lambda data: fn(data, *args)
+
+        return func
+
+    def size(self, data, size):
+        if (n := len(data)) != size:
+            raise AssertionError(
+                f"tamanho incorreto: esperava {size}, mas obteve {n}\n"
+                f"    valor inválido: {data}"
+            )
