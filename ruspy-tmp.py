@@ -565,7 +565,7 @@ FAT_TOKENS = ["fn FN", "fat ID", "n ID", "r ID", "n INT","for FOR", "i INT", "1.
 
 # test_re_grp
 SUBS_REMOVER_COMENTARIOS = (r"#.*", "")
-SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", r'"""\1"""') # Caso use re.sub
+SUBS_COMENTARIOS_STRINGS = (r"^(\s*)#\s*(.*)", r'\1"""\2"""') # Caso use re.sub
 # SUBS_COMENTARIOS_STRINGS = (r"^#(.*)", '"""$1"""') # Caso use o VSCode
 
 
